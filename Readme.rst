@@ -25,6 +25,61 @@ Usage
     Usage: pyknow_rt [options]
 
 
+Async iterators use the rethinkdb way. that is, the format::
+
+    {'old_val': "old_value",
+     'new_val': "new_value"}
+
+For rules, there is an extra "status" parameter, a 'consecuence'
+parameter and a 'rule' one::
+
+    {'old_val': {
+        'status': False,
+        'consecuence': 'execute', +
+        'rule': {'Rule':...},
+    }
+    'new_val': {
+        'status': True,
+        'consecuence': 'execute',
+        'rule': {'Rule': ...}}}
+
+And for facts::
+
+    {'old_val': {
+        'type': 'FooFact',
+        'foo': 'bar'},
+     'new_val': {}}
+
+
+Pyknow rules are defined in json, as in::
+
+    {'Rule': [
+
+        {'Number': {'a': {'MATCH': 'a'}},
+        {'Number': {'b': {'MATCH': 'b'}}},
+        {'TEST': {['executor.operator.test_gt']},
+        {'Number': {'c': {'MATCH': 'c'}}},
+        {'TEST': {'args': ['executor.operator.test_gt']}},
+    ]}
+
+
+Usage requires passing a Rethinkdb async iterator watching changes on rules and facts::
+
+    from pyknow_rt import PyknowRT
+
+    class Executor:
+        def do_things(self):
+            pass
+
+    async def main(connection, sname="my_session_name"):
+        """Main executor."""
+
+        connection = await connection
+        rules = await r.table('rules_{}'.format(sname)).changes().run(connection)
+        facts = await r.table('facts_{}'.format(sname)).changes().run(connection)
+        await PyknowRT(sname, Executor, rules, facts).run()
+
+
 Distributing
 ------------
 
