@@ -1,0 +1,26 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+docopt = "*"
+pyknow = "*"
+rethinkdb = "*"
+
+
+[dev-packages]
+
+behave = "*"
+pytest = "*"
+pytest-cov = "*"
+"pytest-flake8" = "*"
+pytest-asyncio = "*"
+
+
+[requires]
+
+python_version = "3.5"
